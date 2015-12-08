@@ -12,95 +12,50 @@ public class UIKeyboard : MonoBehaviour
 
     void OnEnable()
     {
-        KeyBoardInputListener.OnKeyInputReceived += HighlightKeyEntered;
+        KeyBoardInputListener.OnKeyInputReceived += keyId => HighlightKeyEntered(keyId);
     }
 
     void OnDisable()
     {
-        KeyBoardInputListener.OnKeyInputReceived -= HighlightKeyEntered;
+        KeyBoardInputListener.OnKeyInputReceived -= keyId => HighlightKeyEntered(keyId);
     }
 
     void Awake()
     {
         foreach (Transform child in transform)
         {
-            keys.Add(new UIKey(child.name[0], child.GetComponent<SpriteRenderer>()));
+            keys.Add(new UIKey(child.name, child.GetComponent<SpriteRenderer>()));
         }
     }
 
-    void HighlightKeyEntered(char keyId)
+    void HighlightKeyEntered(string keyId)
     {
         StartCoroutine(HighlightKeyForSeconds(.05f, keyId));
     }
 
-    public IEnumerator HighlightKeyForSeconds(float seconds, char keyId)
+    public IEnumerator HighlightKeyForSeconds(float seconds, string keyId)
     {
         UIKey key = FindKey(keyId);
+        if (key == null) yield break;
+
         key.HighlightKey(Color.blue);
         yield return new WaitForSeconds(seconds);
         key.HighlightKey(Color.white);
     }
 
-    UIKey FindKey(char keyId)
+    UIKey FindKey(string keyId)
     {
-        return keys.Find(key => key.Id.Equals(keyId));
+        return keys.Find(key => key.Id.ToLower().Equals(keyId.ToLower()));
     }
 
-
-
-
-
-
-
-    //public Text textString;
-
-    //private char _keyEntered;
-    //private char _currentLetter;
-    //private int _counter = 0;
-
-    //void Update ()
-    //{
-
-    //    string textStream = textString.text;
-
-    //    if (_counter != textStream.Length)
-    //    {
-    //        _currentLetter = textStream[_counter];
-    //    }
-    //    else
-    //    {
-    //        Debug.Log("You won");
-    //    }
-
-    //    foreach (char c in Input.inputString)
-    //    {
-    //        _keyEntered = c;
-    //    }
-
-    //    if (Input.anyKeyDown)
-    //    {
-    //        if (_keyEntered == _currentLetter)
-    //        {
-    //            textString.text = textString.text.Insert(_counter, "<color=green>");
-    //            textString.text = textString.text.Insert(_counter + 14, "</color>");
-    //            _counter += 14 + 8;
-    //        }
-    //        else
-    //        {
-    //            textString.text = textString.text.Insert(_counter, "<color=red>");
-    //            textString.text = textString.text.Insert(_counter + 12, "</color>");
-    //            _counter += 12 + 8;
-    //        }
-    //    }
-    //}
 }
 
 internal class UIKey
 {
     private SpriteRenderer _sprite;
-    private char _id;
+    private string _id;
 
-    public UIKey(char id, SpriteRenderer spRenderer)
+    public UIKey(string id, SpriteRenderer spRenderer)
     {
         _id = id;
         _sprite = spRenderer;
@@ -112,7 +67,7 @@ internal class UIKey
      
     }
 
-    public char Id {
+    public string Id {
         get { return _id; }
     }
 }
