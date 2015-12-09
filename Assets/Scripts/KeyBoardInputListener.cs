@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 
 public class KeyBoardInputListener : MonoBehaviour {
 
@@ -18,16 +16,22 @@ public class KeyBoardInputListener : MonoBehaviour {
 
                 string keyId = Input.inputString;
 
-                if (keyId == " ")
-                    keyId = "Spacebar";
-                if (Input.GetKeyDown(KeyCode.LeftShift))
-                    keyId = "LeftShift";
-                if (Input.GetKeyDown(KeyCode.RightShift))
-                    keyId = "RightShift";
-                if (Input.GetKeyDown(KeyCode.Return))
-                    keyId = "Enter";
-                if (Input.GetKeyDown(KeyCode.CapsLock))
-                    keyId = "Caps";
+                foreach (char c in Input.inputString)
+                {
+                    if (c == "\b"[0] || c == "\n"[0] || c == "\r"[0])
+                        keyId = "";
+                }
+
+                //if (keyId == " ")
+                //    keyId = "Spacebar";
+                //if (Input.GetKeyDown(KeyCode.LeftShift))
+                //    keyId = "LeftShift";
+                //if (Input.GetKeyDown(KeyCode.RightShift))
+                //    keyId = "RightShift";
+                //if (Input.GetKeyDown(KeyCode.Return))
+                //    keyId = "Enter";
+                //if (Input.GetKeyDown(KeyCode.CapsLock))
+                //    keyId = "Caps";
                 if (Input.GetKeyDown(KeyCode.Backspace))
                     keyId = "BackSpace";
 
@@ -38,3 +42,5 @@ public class KeyBoardInputListener : MonoBehaviour {
         }
     }
 }
+
+

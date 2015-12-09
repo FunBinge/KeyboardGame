@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
+
 
 public class RandomTargetString : MonoBehaviour
 {
@@ -13,47 +13,57 @@ public class RandomTargetString : MonoBehaviour
 
     private List<string> _wordList = new List<string>();
     private Text _targetText;
+    private int _characterLimit = 0;
+    private string _randomString;
+
+    public int TargetTextLength
+    {
+        get { return _randomString.Length; }
+    }
 
     // Use this for initialization
-	void Awake ()
-	{	    	  
-	    GenerateWordList();
-
+    void Awake ()
+	{
 	    _targetText = GetComponent<Text>();
-        _targetText.text = GenerateRandomString(numberOfWordsPerString);
-	}
+        _characterLimit = CalculateCharacterLimit();
+        GenerateWordList();        
+        DisplayNewRandomLine();                
+    }
+
+    private int CalculateCharacterLimit()
+    {
+        TextGenerator _textGenerator = _targetText.cachedTextGenerator;
+        _textGenerator.Populate(_targetText.text, _targetText.GetGenerationSettings(_targetText.rectTransform.rect.size));
+
+        int visibleChars = _textGenerator.characterCountVisible;
+        return visibleChars;
+    }
 
     private void GenerateWordList()
     {
         var words = Resources.Load<TextAsset>("Words");
-        _wordList = words.text.Split('\n').ToList();
+        _wordList = words.text.Split('\n').Select(w => w.Trim()).ToList();
     }
 
-    string GenerateRandomString(int targetWordCount)
+    public void DisplayNewRandomLine()
+    {
+        var randomWords = GenerateRandomWords(numberOfWordsPerString);
+        _randomString = string.Join(" ", randomWords.ToArray());
+
+        if (_randomString.Length > _characterLimit)        
+            _randomString = _randomString.Substring(0, _characterLimit).Trim();
+        
+        _targetText.text = _randomString;
+
+    }
+
+    private List<string> GenerateRandomWords(int targetWordCount)
     {
         var randomWords = new List<string>(targetWordCount);
-        string randomString = null;
 
-        for (var i = 0; i < targetWordCount; i++)        
-            randomWords.Add(_wordList [Random.Range(0, _wordList.Count)]);
+        for (var i = 0; i < targetWordCount; i++)
+            randomWords.Add(_wordList[Random.Range(0, _wordList.Count)]);
 
-        for (int index = 0; index < randomWords.Count; index++)
-        {
-            var randomWord = randomWords[index];
-
-            if (index == randomWords.Count)  //Start without a space
-            {
-                if (randomString != null) randomString += randomWord.Substring(0, randomString.Length - 1);
-            }
-            else                                       
-                randomString += (randomWord + " ");
-        }
-
-        return System.Text.RegularExpressions.Regex.Replace(randomString, @"\s+", " ");	//Make sure the random string is all single spaced;                
-    }
-
-    public Text TargetText
-    {
-        get { return _targetText; }
+        return randomWords;
     }
 }

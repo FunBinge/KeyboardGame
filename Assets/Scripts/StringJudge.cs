@@ -1,65 +1,61 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Linq;
 using UnityEngine.UI;
 
 public class StringJudge : MonoBehaviour
-{
-    
-    private Text _inputText;
-    private Text _targetText;
-
+{        
+    private Text _targetDisplayText;
     private string _targetString;
 
-	// Use this for initialization
+    // Use this for initialization
 	void Start ()
-	{
-	    _inputText = GameObject.FindGameObjectWithTag("InputString").GetComponent<Text>();
-	    _targetText = GameObject.FindGameObjectWithTag("TargetString").GetComponent<Text>();
-	    //_targetString = System.Text.RegularExpressions.Regex.Replace(_targetText.text, @"\s+", " ");	//Make sure target string is all single spaced
-	    _targetString = _targetText.text;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	    if (Input.anyKeyDown)
-	    {
-	        _targetText.text = JudgeText(_inputText.text.ToCharArray(), _targetString.ToCharArray());
-	    }
+	{	    
+	    _targetDisplayText = GameObject.FindGameObjectWithTag("TargetString").GetComponent<Text>();	    
+	    _targetString = _targetDisplayText.text;
 	}
 
-    private string JudgeText(char[] inputStr, char[] targetStr)
+    void OnEnable()
     {
-        var inputText = inputStr.Select(c => c.ToString()).ToArray();
-        var targetText = targetStr.Select(c => c.ToString()).ToArray();
-
-        var tempTargetText = (string[])targetText.Clone();
-
-        for (int index = 0; index < inputText.Length; index++)
-        {
-            string targetLetter = tempTargetText[index];
-            string inputLetter = inputText[index];
-
-            if (inputLetter != targetLetter)
-            {
-                if (targetLetter != " ")
-                    targetText[index] = "<color=red>" + targetLetter + "</color>";
-                else
-                {
-                    targetText[index] = "<color=red>" + "*" + "</color>";
-                }
-            }
-            else
-            {
-                if (targetLetter != " ")
-                    targetText[index] = "<color=green>" + targetLetter + "</color>";
-                else
-                {
-                    targetText[index] = "<color=green>" + "*" + "</color>";
-                }
-            }
-        }
-
-        return string.Join("", targetText);
+        KeyboardInputString.OnInputStringEdited += JudgeText;
     }
+
+    void OnDisable()
+    {
+        KeyboardInputString.OnInputStringEdited -= JudgeText;
+    }
+
+    public void UpdateTargetString()
+    {
+        _targetString = _targetDisplayText.text;
+    }
+
+    public void JudgeText(string inputStr)
+    {
+        string [] judgedText = _targetString.Select(c => c.ToString()).ToArray();
+
+        for (var index = 0; index < inputStr.Length && index < _targetString.Length; index++)
+        {
+            char targetLetter = _targetString[index];
+            char inputLetter = inputStr[index];
+
+            if (inputLetter.Equals(targetLetter))
+                judgedText[index] = MarkAsRight(targetLetter);            
+            else            
+                judgedText[index] = MarkAsWrong(targetLetter);
+                        
+        }
+        _targetDisplayText.text = string.Join("", judgedText);
+    }
+
+    private string MarkAsRight(char targetLetter)
+    {
+        return RichTextFormatter.StringColor(targetLetter == ' ' ? "*" : targetLetter.ToString(),
+            RichTextFormatter.Colors.green);
+    }
+    private string MarkAsWrong(char targetLetter)
+    {
+        return RichTextFormatter.StringColor(targetLetter == ' ' ? "*" : targetLetter.ToString(),
+            RichTextFormatter.Colors.red);
+    }
+
 }
