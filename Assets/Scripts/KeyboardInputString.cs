@@ -10,13 +10,13 @@ public class KeyboardInputString : MonoBehaviour
     private Text _targetText;
     private int stringLengthLimit = 0;
 
-    private string _inputString = "";
-    public string InputString {
+    private static string _inputString = "";
+    public static string InputString {
         get { return _inputString; } 
         private set
         {
-            _inputString = value;
-            Debug.Log(_inputString);
+            _inputString = value;    
+                 
             if (OnInputStringEdited != null)
                 OnInputStringEdited.Invoke(_inputString);
         }
@@ -32,11 +32,13 @@ public class KeyboardInputString : MonoBehaviour
     void OnEnable()
     {
         KeyBoardInputListener.OnKeyInputReceived += ReceiveInput;
+        LineSubmitter.OnSubmittedSuccessfully += OnSubmit;
     }
 
     void OnDisable()
     {
         KeyBoardInputListener.OnKeyInputReceived -= ReceiveInput;
+        LineSubmitter.OnSubmittedSuccessfully -= OnSubmit;
     }
 
     private void ReceiveInput(string inputKey)
@@ -54,12 +56,13 @@ public class KeyboardInputString : MonoBehaviour
 
     private void DeleteLastChar()
     {
-        InputString = _inputString.Remove(_inputString.Length - 1);
+        if (_inputString.Length > 0)
+            InputString = _inputString.Remove(_inputString.Length - 1);
     }
 
     private void ClearInputString()
     {
-        InputString = "";
+        _inputString = "";
     }
 
     private void UpdateInputFieldWordLimit()
@@ -67,9 +70,8 @@ public class KeyboardInputString : MonoBehaviour
         stringLengthLimit = _targetText.text.Length;
     }
 
-    //Event called by keyboard "LineSubmitter"
     public void OnSubmit()
-    {
+    {        
         ClearInputString();
         UpdateInputFieldWordLimit();
     }

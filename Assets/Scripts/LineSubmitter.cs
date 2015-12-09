@@ -1,17 +1,15 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 
 public class LineSubmitter : MonoBehaviour
 {
-    public SubmitLineEvent OnSubmittedSuccessfully;
+    public delegate void SubmittedSuccessfully();
+    public static event SubmittedSuccessfully OnSubmittedSuccessfully;
 
     private RandomTargetString _targetText;
-    private KeyboardInputString _keyboardInputString;
 
     void Start()
     {
-        _targetText = GameObject.FindGameObjectWithTag("TargetString").GetComponent<RandomTargetString>();
-        _keyboardInputString = GameObject.FindGameObjectWithTag("InputString").GetComponent<KeyboardInputString>();
+        _targetText = GameObject.FindGameObjectWithTag("TargetString").GetComponent<RandomTargetString>();       
 
     }
 
@@ -19,7 +17,7 @@ public class LineSubmitter : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            AttemptToSubmitLine(_keyboardInputString.InputString);
+            AttemptToSubmitLine(KeyboardInputString.InputString);
         }
     }
 
@@ -27,13 +25,7 @@ public class LineSubmitter : MonoBehaviour
     {
         if (submittedStr.Length <= 0)
             return;
-        if (_targetText.TargetTextLength == _keyboardInputString.InputString.Length && OnSubmittedSuccessfully != null)
-            OnSubmittedSuccessfully.Invoke(submittedStr);
+        if (_targetText.TargetStringLength == KeyboardInputString.InputString.Length && OnSubmittedSuccessfully != null)
+            OnSubmittedSuccessfully.Invoke();
     }
-}
-
-[System.Serializable]
-public class SubmitLineEvent : UnityEvent<string>
-{
-
 }
