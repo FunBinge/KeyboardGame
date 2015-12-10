@@ -2,75 +2,62 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class KeyboardInputString : MonoBehaviour
+public class KeyboardInputString
 {
-    public delegate void InputStringEdited();
-    public static event InputStringEdited OnInputStringEdited;
-    
-    private int stringLengthLimit = 0;
 
-    private static string _inputString = "";
-    public static string InputString {
+    private static KeyboardInputString _instance;
+
+    private KeyboardInputString(){ UpdateInputStringMaxLength(TargetTextString.TargetString.Length); }
+
+    public static KeyboardInputString Instance
+    {
+        get { if (_instance == null)
+                _instance = new KeyboardInputString();
+                
+                return _instance;
+        }
+    }
+
+    private string _inputString = "";
+
+    public delegate void InputStringEdited();
+    public event InputStringEdited OnInputStringEdited;
+
+    public string InputString {
         get { return _inputString; } 
         private set
         {
-            _inputString = value;    
-                 
+            _inputString = value;            
             if (OnInputStringEdited != null)
                 OnInputStringEdited.Invoke();
         }
     }
 
-    void Start()
-    {              
-        UpdateInputStringMaxLength();
-    }
+    private int stringLengthLimit = 0;
 
-    void OnEnable()
-    {
-        KeyBoardInputListener.OnKeyInputReceived += ReceiveInput;
-        LineSubmitter.OnSubmittedSuccessfully += OnSubmit;
-    }
-
-    void OnDisable()
-    {
-        KeyBoardInputListener.OnKeyInputReceived -= ReceiveInput;
-        LineSubmitter.OnSubmittedSuccessfully -= OnSubmit;
-    }
-
-    private void ReceiveInput(string inputKey)
-    {
-        if (inputKey.Equals("BackSpace"))
-        {
-            DeleteLastChar();
+    public void ReceiveInput(string inputKey)
+    {       
+        if (inputKey == "")
             return;
-        }
 
         if (_inputString.Length < stringLengthLimit)
-            InputString += inputKey;
-        
+            InputString += inputKey;        
     }
 
-    private void DeleteLastChar()
+    public void DeleteLastChar()
     {
         if (_inputString.Length > 0)
             InputString = _inputString.Remove(_inputString.Length - 1);
     }
 
-    private void ClearInputString()
+    public void ClearInputString()
     {
         _inputString = "";
     }
 
-    private void UpdateInputStringMaxLength()
+    public void UpdateInputStringMaxLength(int newMaxLength)
     {
-        stringLengthLimit = TargetTextString.TargetString.Length;
-    }
-
-    public void OnSubmit()
-    {        
-        ClearInputString();
-        UpdateInputStringMaxLength();
+        stringLengthLimit = newMaxLength;
     }
 }
 

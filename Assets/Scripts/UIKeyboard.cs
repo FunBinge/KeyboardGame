@@ -12,12 +12,12 @@ public class UIKeyboard : MonoBehaviour
 
     void OnEnable()
     {
-        KeyBoardInputListener.OnKeyInputReceived += keyId => HighlightKeyEntered(keyId);
+        //KeyBoardInputListener.OnKeyInputReceived += keyId => HighlightKeyEntered(keyId);
     }
 
     void OnDisable()
     {
-        KeyBoardInputListener.OnKeyInputReceived -= keyId => HighlightKeyEntered(keyId);
+        //KeyBoardInputListener.OnKeyInputReceived -= keyId => HighlightKeyEntered(keyId);
     }
 
     void Awake()

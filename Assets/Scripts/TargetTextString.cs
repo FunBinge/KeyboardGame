@@ -23,23 +23,20 @@ public class TargetTextString : MonoBehaviour
 
     // Use this for initialization
     void Awake ()
-	{
+	{        
         _wordExtractor = new WordExtractor(Resources.Load<TextAsset>("Words"));
 	    _targetTextDisplay = GetComponent<Text>();
         _characterLimit = CalculateCharacterLimit();              
-        DisplayNewRandomLine();                
-    }
+        DisplayNewRandomLine();
 
-    void OnEnable()
-    {
-        KeyboardInputString.OnInputStringEdited += DisplayFeedbackString;
-        LineSubmitter.OnSubmittedSuccessfully += DisplayNewRandomLine;
-    }
+        KeyboardInputString.Instance.OnInputStringEdited += DisplayFeedbackString;
+        KeyBoardInputListener.OnSubmittedSuccessfully += DisplayNewRandomLine;
+    }   
 
     void OnDisable()
     {
-        KeyboardInputString.OnInputStringEdited -= DisplayFeedbackString;
-        LineSubmitter.OnSubmittedSuccessfully -= DisplayNewRandomLine;
+        KeyboardInputString.Instance.OnInputStringEdited -= DisplayFeedbackString;
+        KeyBoardInputListener.OnSubmittedSuccessfully -= DisplayNewRandomLine;
     }
 
     public void DisplayNewRandomLine()
@@ -56,12 +53,14 @@ public class TargetTextString : MonoBehaviour
 
 
         _targetTextDisplay.text = _randomString;
+        Debug.Log("Random string generated\nInputString length made to match new random string");
+        KeyboardInputString.Instance.UpdateInputStringMaxLength(TargetString.Length);
 
     }
 
     public void DisplayFeedbackString ()
     {
-        _targetTextDisplay.text = StringJudge.CompareStringToTargetString(KeyboardInputString.InputString, _randomString);
+        _targetTextDisplay.text = StringJudge.CompareStringToTargetString(KeyboardInputString.Instance.InputString, _randomString);
     }
 
     private int CalculateCharacterLimit()

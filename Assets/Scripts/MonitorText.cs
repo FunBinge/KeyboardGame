@@ -6,14 +6,25 @@ public class MonitorText : MonoBehaviour
 
     private Text _text;
 
-	// Use this for initialization
-	void Start ()
-	{
-	    _text = GetComponent<Text>();
-	}
-
-    public void SubmitStringToMonitor(string str)
+    void Start()
     {
-        _text.text += "\n>" + str;
+        _text = GetComponent<Text>();
+    }
+
+    void OnEnable()
+    {
+        KeyBoardInputListener.OnSubmittedSuccessfully += SubmitStringToMonitor;
+    }
+
+    void OnDisable()
+    {
+        KeyBoardInputListener.OnSubmittedSuccessfully -= SubmitStringToMonitor;
+
+    }
+
+    public void SubmitStringToMonitor()
+    {
+        Debug.Log("Submitting results to monitor");
+        _text.text += "\n>" + StringJudge.CompareStringToTargetString(TargetTextString.TargetString, KeyboardInputString.Instance.InputString);
     }
 }
