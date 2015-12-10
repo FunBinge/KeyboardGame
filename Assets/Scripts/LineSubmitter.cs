@@ -4,12 +4,12 @@ public class LineSubmitter : MonoBehaviour
 {
     public delegate void SubmittedSuccessfully();
     public static event SubmittedSuccessfully OnSubmittedSuccessfully;
-
-    private RandomTargetString _targetText;
+    
+    private MonitorText _monitor;
 
     void Start()
-    {
-        _targetText = GameObject.FindGameObjectWithTag("TargetString").GetComponent<RandomTargetString>();       
+    {        
+        _monitor = GameObject.FindGameObjectWithTag("Monitor").GetComponentInChildren<MonitorText>();
 
     }
 
@@ -25,7 +25,11 @@ public class LineSubmitter : MonoBehaviour
     {
         if (submittedStr.Length <= 0)
             return;
-        if (_targetText.TargetStringLength == KeyboardInputString.InputString.Length && OnSubmittedSuccessfully != null)
+
+        if (TargetTextString.TargetString.Length == KeyboardInputString.InputString.Length && OnSubmittedSuccessfully != null)
+        {            
+            _monitor.SubmitStringToMonitor(KeyboardInputString.InputString);
             OnSubmittedSuccessfully.Invoke();
+        }
     }
 }

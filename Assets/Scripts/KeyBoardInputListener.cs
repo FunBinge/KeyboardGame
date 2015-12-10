@@ -13,7 +13,7 @@ public class KeyBoardInputListener : MonoBehaviour {
 
             if (OnKeyInputReceived != null)
             {
-
+                
                 string keyId = Input.inputString;
 
                 foreach (char c in Input.inputString)

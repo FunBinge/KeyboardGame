@@ -4,10 +4,9 @@ using System.Collections;
 
 public class KeyboardInputString : MonoBehaviour
 {
-    public delegate void InputStringEdited(string newStr);
+    public delegate void InputStringEdited();
     public static event InputStringEdited OnInputStringEdited;
-
-    private Text _targetText;
+    
     private int stringLengthLimit = 0;
 
     private static string _inputString = "";
@@ -18,15 +17,13 @@ public class KeyboardInputString : MonoBehaviour
             _inputString = value;    
                  
             if (OnInputStringEdited != null)
-                OnInputStringEdited.Invoke(_inputString);
+                OnInputStringEdited.Invoke();
         }
     }
 
     void Start()
-    {
-        GetComponent<InputField>();
-        _targetText = GameObject.FindGameObjectWithTag("TargetString").GetComponent<Text>();
-        UpdateInputFieldWordLimit();
+    {              
+        UpdateInputStringMaxLength();
     }
 
     void OnEnable()
@@ -65,15 +62,15 @@ public class KeyboardInputString : MonoBehaviour
         _inputString = "";
     }
 
-    private void UpdateInputFieldWordLimit()
+    private void UpdateInputStringMaxLength()
     {
-        stringLengthLimit = _targetText.text.Length;
+        stringLengthLimit = TargetTextString.TargetString.Length;
     }
 
     public void OnSubmit()
     {        
         ClearInputString();
-        UpdateInputFieldWordLimit();
+        UpdateInputStringMaxLength();
     }
 }
 

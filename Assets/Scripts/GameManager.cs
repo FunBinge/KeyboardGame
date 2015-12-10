@@ -16,7 +16,6 @@ public class GameManager : MonoBehaviour {
     public static GameManager Instance
     {
         get { return SSingleton ?? (SSingleton = new GameObject("GameManager").AddComponent<GameManager>()); }
-        
     }
 
     void Awake()
