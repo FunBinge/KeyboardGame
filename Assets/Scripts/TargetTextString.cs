@@ -2,10 +2,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-//Hey Tegan, I'll be going on a 20 day holiday soon. I'd like to see you before leaving, 
-//lets grab a boost/coffee/pear cider with cinamon this Monday. 
-//If you behave I might even let you throw the first pretzel when we go pretzel throwing, it's going to be a blast. 
-
 public class TargetTextString : MonoBehaviour
 {
     

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -7,7 +8,8 @@ public class UIKeyboard : MonoBehaviour
 
     private List<UIKey> keys = new List<UIKey>();
     private UIKey _targetKey;
-    private UIKey _shiftKey;
+    private UIKey _lShiftKey;
+    private UIKey _rShiftKey;
 
 
     void Awake()
@@ -18,7 +20,8 @@ public class UIKeyboard : MonoBehaviour
         }
 
         _targetKey = keys[0];
-        _shiftKey = FindKey("");
+        _lShiftKey = FindKey("LeftShift");
+        _rShiftKey = FindKey("RightShift");
     }
 
     void Update()
@@ -32,14 +35,27 @@ public class UIKeyboard : MonoBehaviour
         if (!KeyboardInputString.Instance.ReachedMaxLength())
         {
             string keyId = TargetTextString.StringToMatch[KeyboardInputString.Instance.InputString.Length].ToString();
+
+            if (keyId == " ")
+                keyId = "Spacebar";
+
             if (_targetKey.Id != keyId)
             {
                 UIKey keyToHighlight = FindKey(keyId);
                 if (keyToHighlight != null)
                 {
+                    //Reset key color
+                    _lShiftKey.HighlightKey(Color.white);
+                    _rShiftKey.HighlightKey(Color.white);
                     _targetKey.HighlightKey(Color.white);
+
                     keyToHighlight.HighlightKey(Color.yellow);
                     _targetKey = keyToHighlight;
+                    if (keyId.Length < 1 && char.IsUpper(keyId, 0))
+                    {
+                        _lShiftKey.HighlightKey(Color.yellow);
+                        _rShiftKey.HighlightKey(Color.yellow);
+                    }
                 }
             }
         }
