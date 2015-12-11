@@ -2,6 +2,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+//Hey Tegan, I'll be going on a 20 day holiday soon. I'd like to see you before leaving, 
+//lets grab a boost/coffee/pear cider with cinamon this Monday. 
+//If you behave I might even let you throw the first pretzel when we go pretzel throwing, it's going to be a blast. 
+
 public class TargetTextString : MonoBehaviour
 {
     
@@ -10,15 +14,10 @@ public class TargetTextString : MonoBehaviour
     private WordExtractor _wordExtractor;
     private Text _targetTextDisplay;
     private int _characterLimit = 0;
-    private static string _randomString;
+    private static string _stringToMatch;
 
-    public static string TargetString {
-        get { return _randomString; }
-    }
-
-    public int TargetStringLength
-    {
-        get { return _randomString.Length; }
+    public static string StringToMatch {
+        get { return _stringToMatch; }
     }
 
     // Use this for initialization
@@ -30,37 +29,32 @@ public class TargetTextString : MonoBehaviour
         DisplayNewRandomLine();
 
         KeyboardInputString.Instance.OnInputStringEdited += DisplayFeedbackString;
-        KeyBoardInputListener.OnSubmittedSuccessfully += DisplayNewRandomLine;
+        KeyBoardInputListener.OnSubmit += OnSubmit;
     }   
 
     void OnDisable()
     {
         KeyboardInputString.Instance.OnInputStringEdited -= DisplayFeedbackString;
-        KeyBoardInputListener.OnSubmittedSuccessfully -= DisplayNewRandomLine;
+        KeyBoardInputListener.OnSubmit -= OnSubmit;
+    }
+
+    private void OnSubmit(string submittedString)
+    {
+        DisplayNewRandomLine();
     }
 
     public void DisplayNewRandomLine()
-    {        
-        var randomWords = _wordExtractor.GenerateRandomWords(wordCount);
-        _randomString = string.Join(" ", randomWords.ToArray());
+    {
+        _stringToMatch = _wordExtractor.GenerateRandomString(wordCount, _characterLimit);
 
-        if (_randomString.Length > _characterLimit)
-        {
-            _randomString = _randomString.Substring(0, _characterLimit).Trim();
-            int index = _randomString.LastIndexOf(" ", StringComparison.Ordinal);
-            _randomString = _randomString.Substring(0, index);
-        }
-
-
-        _targetTextDisplay.text = _randomString;
-        Debug.Log("Random string generated\nInputString length made to match new random string");
-        KeyboardInputString.Instance.UpdateInputStringMaxLength(TargetString.Length);
+        _targetTextDisplay.text = _stringToMatch;  
+        KeyboardInputString.Instance.UpdateInputStringMaxLength(_stringToMatch.Length);      
 
     }
 
     public void DisplayFeedbackString ()
     {
-        _targetTextDisplay.text = StringJudge.CompareStringToTargetString(KeyboardInputString.Instance.InputString, _randomString);
+        _targetTextDisplay.text = StringJudge.CompareStringToTargetString(KeyboardInputString.Instance.InputString, _stringToMatch);
     }
 
     private int CalculateCharacterLimit()

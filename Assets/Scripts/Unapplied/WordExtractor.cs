@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class WordExtractor
 {    
@@ -19,5 +21,20 @@ public class WordExtractor
             randomWords.Add(_wordList[Random.Range(0, _wordList.Count)]);
 
         return randomWords;
+    }
+
+    public string GenerateRandomString(int wordCount, int characterLimit)
+    {
+        var randomWords = GenerateRandomWords(wordCount);
+        var randomString = string.Join(" ", randomWords.ToArray());
+
+        if (randomString.Length > characterLimit)
+        {
+            randomString = randomString.Substring(0, characterLimit).Trim();
+            int index = randomString.LastIndexOf(" ", StringComparison.Ordinal);
+            randomString = randomString.Substring(0, index);
+        }
+
+        return randomString;
     }
 }

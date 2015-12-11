@@ -1,24 +1,14 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 
 public class UIKeyboard : MonoBehaviour
 {
 
     private List<UIKey> keys = new List<UIKey>();
+    private UIKey _targetKey;
+    private UIKey _shiftKey;
 
-    void OnEnable()
-    {
-        //KeyBoardInputListener.OnKeyInputReceived += keyId => HighlightKeyEntered(keyId);
-    }
-
-    void OnDisable()
-    {
-        //KeyBoardInputListener.OnKeyInputReceived -= keyId => HighlightKeyEntered(keyId);
-    }
 
     void Awake()
     {
@@ -26,19 +16,39 @@ public class UIKeyboard : MonoBehaviour
         {
             keys.Add(new UIKey(child.name, child.GetComponent<SpriteRenderer>()));
         }
+
+        _targetKey = keys[0];
+        _shiftKey = FindKey("");
     }
 
-    void HighlightKeyEntered(string keyId)
+    void Update()
     {
-        StartCoroutine(HighlightKeyForSeconds(.05f, keyId));
+        if (GameManager.Instance.CurrentGameState == GameManager.GameState.IN_GAME)
+            HighlightNextChar();
     }
 
-    public IEnumerator HighlightKeyForSeconds(float seconds, string keyId)
+    void HighlightNextChar()
     {
-        UIKey key = FindKey(keyId);
-        if (key == null) yield break;
+        if (!KeyboardInputString.Instance.ReachedMaxLength())
+        {
+            string keyId = TargetTextString.StringToMatch[KeyboardInputString.Instance.InputString.Length].ToString();
+            if (_targetKey.Id != keyId)
+            {
+                UIKey keyToHighlight = FindKey(keyId);
+                if (keyToHighlight != null)
+                {
+                    _targetKey.HighlightKey(Color.white);
+                    keyToHighlight.HighlightKey(Color.yellow);
+                    _targetKey = keyToHighlight;
+                }
+            }
+        }
+    }
 
+    private IEnumerator HighlightKeyForSeconds(float seconds, UIKey key)
+    {
         key.HighlightKey(Color.blue);
+
         yield return new WaitForSeconds(seconds);
         key.HighlightKey(Color.white);
     }

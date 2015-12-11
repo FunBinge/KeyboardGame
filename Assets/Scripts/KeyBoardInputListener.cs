@@ -2,40 +2,50 @@
 
 public class KeyBoardInputListener : MonoBehaviour {
 
-    public delegate void SubmittedSuccessfully();
-    public static event SubmittedSuccessfully OnSubmittedSuccessfully;
+    public delegate void Submit(string str);
+    public static event Submit OnSubmit;
 
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.CurrentGameState == GameManager.GameState.IN_GAME && Input.anyKeyDown && !Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1))
+        if (GameManager.Instance.CurrentGameState == GameManager.GameState.IN_GAME && Input.anyKeyDown && !Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1))
         {
-            foreach (char c in Input.inputString)
+            var key = Input.inputString;
+
+            foreach (char c in key)
             {
-                if (c == "\b"[0])
+                if (IsBackspace(c))
                 {
                     KeyboardInputString.Instance.DeleteLastChar();
                     return;
                 }
 
-                if ((c == "\n"[0] || c == "\r"[0]) &&
-                    TargetTextString.TargetString.Length == KeyboardInputString.Instance.InputString.Length)
+                if (IsEnter(c) && KeyboardInputString.Instance.ReachedMaxLength())
                 {
-                                        
-                    if (OnSubmittedSuccessfully != null)
-                        OnSubmittedSuccessfully.Invoke();
+                    if (OnSubmit != null)
+                        OnSubmit.Invoke(StringJudge.CompareStringToTargetString(TargetTextString.StringToMatch, KeyboardInputString.Instance.InputString));
 
-                    Debug.Log("Clearing old string");
                     KeyboardInputString.Instance.ClearInputString();
-
+                    KeyboardInputString.Instance.UpdateInputStringMaxLength(TargetTextString.StringToMatch.Length);
 
                     return;
                 }
-                    
             }
-            KeyboardInputString.Instance.ReceiveInput(Input.inputString);
+
+            if (key != "")
+                KeyboardInputString.Instance.ReceiveInput(key);
 
         }
+    }
+
+    private bool IsEnter(char c)
+    {
+        return (c == "\n"[0] || c == "\r"[0]);
+    }
+
+    private bool IsBackspace(char c)
+    {
+        return (c == "\b"[0]);
     }
 }
 

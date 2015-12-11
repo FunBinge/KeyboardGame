@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour {
         IN_GAME,
     }
 
-    public static GameState CurrentGameState = GameState.PAUSED;
+    public GameState CurrentGameState = GameState.PAUSED;
 
     public static GameManager SSingleton = null;
 

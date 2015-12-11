@@ -7,7 +7,7 @@ public class KeyboardInputString
 
     private static KeyboardInputString _instance;
 
-    private KeyboardInputString(){ UpdateInputStringMaxLength(TargetTextString.TargetString.Length); }
+    private KeyboardInputString(){ }
 
     public static KeyboardInputString Instance
     {
@@ -33,13 +33,10 @@ public class KeyboardInputString
         }
     }
 
-    private int stringLengthLimit = 0;
+    private int stringLengthLimit = 10;
 
     public void ReceiveInput(string inputKey)
     {       
-        if (inputKey == "")
-            return;
-
         if (_inputString.Length < stringLengthLimit)
             InputString += inputKey;        
     }
@@ -53,6 +50,11 @@ public class KeyboardInputString
     public void ClearInputString()
     {
         _inputString = "";
+    }
+
+    public bool ReachedMaxLength()
+    {
+        return _inputString.Length >= stringLengthLimit;
     }
 
     public void UpdateInputStringMaxLength(int newMaxLength)
