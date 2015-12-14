@@ -2,26 +2,21 @@
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class UIKeyboard : MonoBehaviour
 {
 
-    private List<UIKey> keys = new List<UIKey>();
+    private List<UIKey> _stringKeys;
+    private List<UIKey> _modifierKeys; 
     private UIKey _targetKey;
-    private UIKey _lShiftKey;
-    private UIKey _rShiftKey;
 
 
     void Awake()
     {
-        foreach (Transform child in transform)
-        {
-            keys.Add(new UIKey(child.name, child.GetComponent<SpriteRenderer>()));
-        }
+        LoadKeyboardKeyLists();
 
-        _targetKey = keys[0];
-        _lShiftKey = FindKey("LeftShift");
-        _rShiftKey = FindKey("RightShift");
+        _targetKey = _stringKeys[0];
     }
 
     void Update()
@@ -29,6 +24,17 @@ public class UIKeyboard : MonoBehaviour
         if (GameManager.Instance.CurrentGameState == GameManager.GameState.IN_GAME)
             HighlightNextChar();
     }
+
+    private void LoadKeyboardKeyLists()
+    {
+        GameObject[] keyObjects = GameObject.FindGameObjectsWithTag("KeyboardKey");
+        _stringKeys =
+            new List<UIKey>(
+                keyObjects.Select(key => key.GetComponent<UIKey>()).Where(key => key.keyType == UIKey.KeyType.String));
+        _modifierKeys =
+            new List<UIKey>(
+                keyObjects.Select(key => key.GetComponent<UIKey>()).Where(key => key.keyType == UIKey.KeyType.Modifier));
+    }    
 
     void HighlightNextChar()
     {
@@ -39,26 +45,35 @@ public class UIKeyboard : MonoBehaviour
             if (keyId == " ")
                 keyId = "Spacebar";
 
-            if (_targetKey.Id != keyId)
+            if (!_targetKey.MatchesValue(keyId))
             {
-                UIKey keyToHighlight = FindKey(keyId);
-                if (keyToHighlight != null)
-                {
-                    //Reset key color
-                    _lShiftKey.HighlightKey(Color.white);
-                    _rShiftKey.HighlightKey(Color.white);
-                    _targetKey.HighlightKey(Color.white);
+                UIKey keyToHighlight = FindKey(_stringKeys, keyId);
 
+                if (keyToHighlight != null)
+                {        
+                    ResetHighlights();
+
+                    //Highlight shift if necessary
+                    if (keyToHighlight.upperCaseValue.Equals(keyId))
+                        FindKey(_modifierKeys, keyToHighlight.shiftToUse.ToString()).HighlightKey(Color.yellow);
+
+                    //Highlight new TargetKey
                     keyToHighlight.HighlightKey(Color.yellow);
                     _targetKey = keyToHighlight;
-                    if (keyId.Length < 1 && char.IsUpper(keyId, 0))
-                    {
-                        _lShiftKey.HighlightKey(Color.yellow);
-                        _rShiftKey.HighlightKey(Color.yellow);
-                    }
                 }
             }
         }
+        else
+        {
+            ResetHighlights();
+            FindKey(_modifierKeys, "Enter").HighlightKey(Color.yellow);
+        }
+    }
+
+    private void ResetHighlights()
+    {
+        _targetKey.HighlightKey(Color.white);
+        _modifierKeys.ForEach(key => key.HighlightKey(Color.white));
     }
 
     private IEnumerator HighlightKeyForSeconds(float seconds, UIKey key)
@@ -69,31 +84,9 @@ public class UIKeyboard : MonoBehaviour
         key.HighlightKey(Color.white);
     }
 
-    UIKey FindKey(string keyId)
+    UIKey FindKey(List<UIKey> listToSearch  ,string keyId)
     {
-        return keys.Find(key => key.Id.ToLower().Equals(keyId.ToLower()));
+        return listToSearch.Find(key => key.MatchesValue(keyId));
     }
 
-}
-
-internal class UIKey
-{
-    private SpriteRenderer _sprite;
-    private string _id;
-
-    public UIKey(string id, SpriteRenderer spRenderer)
-    {
-        _id = id;
-        _sprite = spRenderer;
-    }
-
-    public void HighlightKey(Color tint)
-    {
-        _sprite.color = tint;
-     
-    }
-
-    public string Id {
-        get { return _id; }
-    }
 }

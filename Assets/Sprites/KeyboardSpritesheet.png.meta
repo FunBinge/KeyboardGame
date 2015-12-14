@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 18f431808209b8b4d9d6887b40d6d1b9
-timeCreated: 1449481210
+timeCreated: 1449956350
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -56,6 +56,7 @@ TextureImporter:
     21300098: KeyboardSpritesheet_56
     21300100: KeyboardSpritesheet_57
     21300102: KeyboardSpritesheet_13
+    21300104: KeyboardSpritesheet_14
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -618,6 +619,16 @@ TextureImporter:
         x: 640
         y: 768
         width: 384
+        height: 128
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: KeyboardSpritesheet_14
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 512
+        width: 128
         height: 128
       alignment: 0
       pivot: {x: .5, y: .5}

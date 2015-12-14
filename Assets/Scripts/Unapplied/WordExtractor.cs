@@ -11,6 +11,7 @@ public class WordExtractor
     public WordExtractor (TextAsset textAsset)
     {
         _wordList = textAsset.text.Split('\n').Select(w => w.Trim()).ToList();
+       
     }
 
     public List<string> GenerateRandomWords(int targetWordCount)
